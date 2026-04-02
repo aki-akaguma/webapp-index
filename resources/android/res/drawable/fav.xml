@@ -1,0 +1,28 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="128dp"
+    android:width="128dp"
+    android:viewportHeight="128"
+    android:viewportWidth="128"
+    >
+    <group
+        android:scaleX="0.6"
+        android:scaleY="0.6"
+        android:translateX="26"
+        android:translateY="26"
+    >
+    <path android:fillColor="#C7D6EA" android:pathData="M28,110a36,7 0,1 0,72 0a36,7 0,1 0,-72 0z"/>
+    <path android:fillColor="#6FA8FF" android:pathData="M48,20L80,20A32,32 0,0 1,112 52L112,68A32,32 0,0 1,80 100L48,100A32,32 0,0 1,16 68L16,52A32,32 0,0 1,48 20z"/>
+    <path android:fillColor="#4F8DFF" android:pathData="M38,20L90,20A22,11 0,0 1,112 31L112,31A22,11 0,0 1,90 42L38,42A22,11 0,0 1,16 31L16,31A22,11 0,0 1,38 20z"/>
+    <path android:fillColor="#FF5C6C" android:pathData="M40,31m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0"/>
+    <path android:fillColor="#FFB703" android:pathData="M54,31m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0"/>
+    <path android:fillColor="#3DDB85" android:pathData="M68,31m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0"/>
+    <path android:fillColor="#1F2A44" android:pathData="M50,66m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+    <path android:fillColor="#1F2A44" android:pathData="M78,66m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+    <path android:fillColor="#00000000" android:pathData="M54,78Q64,86 74,78" android:strokeColor="#1F2A44" android:strokeLineCap="round" android:strokeWidth="4"/>
+    <path android:fillColor="#FF8FA3" android:pathData="M42,76m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0"/>
+    <path android:fillColor="#FF8FA3" android:pathData="M86,76m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M64,96m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0"/>
+    <path android:fillColor="#2E6BFF" android:pathData="M64,92L64,92A3,3 0,0 1,67 95L67,101A3,3 0,0 1,64 104L64,104A3,3 0,0 1,61 101L61,95A3,3 0,0 1,64 92z"/>
+    <path android:fillColor="#2E6BFF" android:pathData="M64,86m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"/>
+    </group>
+</vector>

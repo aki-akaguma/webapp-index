@@ -1,0 +1,73 @@
+[package]
+name = "index"
+version = "0.1.0"
+authors = ["aki <aki.akaguma@hotmail.com>"]
+edition = "2021"
+description = """
+This is a webapp that provides web index page.
+"""
+keywords = ["webapp"]
+categories = ["desktop", "android"]
+#license = "MIT OR Apache-2.0"
+readme = "README.md"
+build = "build.rs"
+rust-version = "1.90.0"
+repository = "https://github.com/aki-akaguma/webapp-index"
+
+
+[package.metadata.patch]
+crates = ["dioxus-fullstack"]
+
+[patch.crates-io]
+dioxus-fullstack = { path = "./patched/dioxus-fullstack-0.7.4" }
+
+[dependencies]
+dioxus = { version = "0.7.4", features = ["fullstack"] }
+dioxus-fullstack = "0.7.4"
+dioxus-desktop = { version = "0.7.4", optional = true }
+dioxus-logger = "0.7.4"
+
+anyhow = { version = "1.0" }
+console_error_panic_hook = "0.1"
+
+tokio = { version = "1.50", features = ["fs"], optional = true }
+
+[target.'cfg(target_os = "android")'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
+
+[build-dependencies]
+rust-version-info-file = "0.2"
+
+
+[features]
+default = ["web"]
+
+web = ["dioxus/web"]
+desktop = ["dioxus/desktop", "dep:dioxus-desktop"]
+mobile = ["dioxus/mobile"]
+server = ["dioxus/server", "dep:tokio"]
+
+debian_build = ["desktop"]
+
+[package.metadata.deb]
+features = ["debian_build"]
+section = "AAA-webapp"
+priority = "optional"
+maintainer = "aki <aki.akaguma@hotmail.com>"
+extended-description = """\
+This is a webapp that provides web index page.
+"""
+depends = "$auto"
+separate-debug-symbols = true
+
+assets = [
+    ["target/release/index", "usr/bin/index", "755"],
+    ["target/rust-version-info.txt", "usr/share/doc/index/", "644"],
+    ["README.md", "usr/share/doc/index/", "644"],
+]
+
+[profile.release]
+strip = "debuginfo"
+opt-level = "s"
+lto = true
+
