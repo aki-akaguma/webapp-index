@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * router of dioxus
 
+### Changed
+* put the app name in the APK download URL
+
 
 ## [0.1.0] (2026-04-03)
 ### Added

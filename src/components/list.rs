@@ -53,7 +53,7 @@ pub fn AppListRowCm(props: AppListRowProps) -> Element {
                 for apk_fnm in apk_fnms.iter() {
                     a {
                         class: "app-list-row-links-a",
-                        href: "android/{apk_fnm}",
+                        href: "android/{app_nm}/{apk_fnm}",
                         img {
                             class: "app-list-row-links-a-img",
                             alt: "Android",
