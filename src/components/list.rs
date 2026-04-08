@@ -1,8 +1,8 @@
 use dioxus::prelude::*;
 
 #[component]
-pub fn List() -> Element {
-    let apps_r = use_resource(move || async move { crate::backends::list_apps().await });
+pub fn List(is_devel: bool) -> Element {
+    let apps_r = use_resource(move || async move { crate::backends::list_apps(is_devel).await });
     rsx! {
         div { class: "app-list",
             if let Some(apps_r) = &*apps_r.read() {

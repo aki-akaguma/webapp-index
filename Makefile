@@ -12,6 +12,9 @@ list:
 clean:
 	cargo clean
 
+check:
+	cargo check
+
 apply-patch:
 	cargo patch-crate
 
@@ -23,6 +26,7 @@ css-watch:
 
 bundle-web:
 	dx bundle --web --release --base-path "/app"
+	cp -a resources/config.toml target/dx/index/release/web/ && chmod 640 target/dx/index/release/web/config.toml
 
 bundle-desktop:
 	dx bundle --desktop --release

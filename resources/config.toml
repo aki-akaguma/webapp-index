@@ -1,0 +1,99 @@
+
+[base]
+base_path = "/opt"
+
+[[apps]]
+name = "broinfo"
+desc = "A browser information utility."
+web = true
+[apps.desktop]
+linux = false
+windows = false
+[apps.android]
+wva = true
+aarch64 = false
+x86_64 = false
+
+[[apps]]
+name = "cattonue"
+desc = "A cat image collection on the web."
+web = true
+[apps.desktop]
+linux = false
+windows = false
+[apps.android]
+wva = true
+aarch64 = false
+x86_64 = false
+
+[[apps]]
+name = "purepic"
+desc = "A easy image processing tool."
+web = true
+[apps.desktop]
+linux = false
+windows = false
+[apps.android]
+wva = true
+aarch64 = false
+x86_64 = false
+
+[[apps]]
+name = "pwgen"
+desc = "An easy password generator."
+web = true
+[apps.desktop]
+linux = false
+windows = false
+[apps.android]
+wva = true
+aarch64 = false
+x86_64 = false
+
+[[apps]]
+name = "tap3beat"
+desc = "A beat viewing tool for beatmania."
+web = true
+[apps.desktop]
+linux = false
+windows = false
+[apps.android]
+wva = true
+aarch64 = false
+x86_64 = false
+
+[[dev_apps]]
+name = "test-inputfile"
+desc = "Testing file input functionality."
+web = true
+[dev_apps.desktop]
+linux = false
+windows = false
+[dev_apps.android]
+wva = true
+aarch64 = false
+x86_64 = false
+
+[[dev_apps]]
+name = "test-wasmworker"
+desc = "Testing WebAssembly WebWorker."
+web = true
+[dev_apps.desktop]
+linux = false
+windows = false
+[dev_apps.android]
+wva = true
+aarch64 = false
+x86_64 = false
+
+[[dev_apps]]
+name = "test-webworker"
+desc = "Testing standard WebWorker."
+web = true
+[dev_apps.desktop]
+linux = false
+windows = false
+[dev_apps.android]
+wva = true
+aarch64 = false
+x86_64 = false

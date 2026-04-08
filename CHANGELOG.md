@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+* `backends::Config` on `config.toml`
 * router of dioxus
 
 ### Changed
@@ -17,6 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 * first commit
 
-[Unreleased]: https://github.com/aki-akaguma/webapp-index/compare/v0.1.10..HEAD
+[Unreleased]: https://github.com/aki-akaguma/webapp-index/compare/v0.1.1..HEAD
 [0.1.1]: https://github.com/aki-akaguma/webapp-index/compare/v0.1.0..v0.1.1
 [0.1.0]: https://github.com/aki-akaguma/webapp-index/releases/tag/v0.1.0

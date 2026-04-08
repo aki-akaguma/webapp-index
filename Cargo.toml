@@ -22,15 +22,20 @@ crates = ["dioxus-fullstack"]
 dioxus-fullstack = { path = "./patched/dioxus-fullstack-0.7.4" }
 
 [dependencies]
+# dioxus family
 dioxus = { version = "0.7.4", features = ["fullstack", "router"] }
 dioxus-fullstack = "0.7.4"
 dioxus-desktop = { version = "0.7.4", optional = true }
 dioxus-logger = "0.7.4"
 
-anyhow = { version = "1.0" }
-console_error_panic_hook = "0.1"
+# depend on dioxus
+anyhow = { version = "1.0.98" }
+tokio = { version = "1.48", features = ["fs"], optional = true }
+serde = { version = "1.0.219" }
 
-tokio = { version = "1.50", features = ["fs"], optional = true }
+# other
+console_error_panic_hook = "0.1"
+toml = "1.1.2"
 
 [target.'cfg(target_os = "android")'.dependencies]
 openssl = { version = "0.10", features = ["vendored"] }
@@ -70,4 +75,3 @@ assets = [
 strip = "debuginfo"
 opt-level = "s"
 lto = true
-

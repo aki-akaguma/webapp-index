@@ -2,13 +2,13 @@ use dioxus::prelude::*;
 #[cfg(all(not(debug_assertions), feature = "desktop"))]
 use dioxus_desktop::{Config, WindowBuilder};
 
-use views::Home;
-
 mod backends;
 mod components;
+mod utils;
 mod views;
 
 use components::*;
+use views::{Devel, Home};
 
 fn main() {
     // You can set the ports and IP manually with env vars:
@@ -61,6 +61,8 @@ fn App() -> Element {
 enum Route {
     #[route("/")]
     Home,
+    #[route("/devel")]
+    Devel,
     //
     #[route("/:..segments")]
     PageNotFound { segments: Vec<String> },
