@@ -34,6 +34,6 @@ pub fn Home() -> Element {
                 p { "{android_desc}" }
             }
         }
-        List {is_devel: false}
+        List { is_devel: false }
     }
 }

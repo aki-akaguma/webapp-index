@@ -7,7 +7,7 @@ pub fn List(is_devel: bool) -> Element {
         div { class: "app-list",
             if let Some(apps_r) = &*apps_r.read() {
                 if let Ok(apps) = apps_r {
-                    for (app_nm , desc , apk_fnms) in apps.iter() {
+                    for (app_nm, desc, apk_fnms) in apps.iter() {
                         AppListRowCm {
                             app_nm,
                             desc,

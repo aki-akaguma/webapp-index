@@ -33,6 +33,7 @@ const MAIN_CSS: Asset = asset!("/assets/css/main.css");
 const TAILWIND_CSS: Asset = asset!("/assets/css/tailwind.css");
 
 const APP_IMG: Asset = asset!("/assets/app.png");
+const EMPTY_IMG: Asset = asset!("/assets/empty.png");
 const WEBAPP_IMG: Asset = asset!("/assets/img/webapp.png");
 const ANDROID_IMG: Asset = asset!("/assets/img/android.png");
 
@@ -53,7 +54,15 @@ fn App() -> Element {
         document::Link { rel: "stylesheet", href: MAIN_CSS }
         document::Link { rel: "stylesheet", href: TAILWIND_CSS }
 
-        div { id: "app-main", class: "app-main", Router::<Route> {} }
+        div { id: "app-main", class: "app-main",
+            Router::<Route> {}
+            Version {}
+            div {
+                a { href: "devel",
+                    img { width: "16px", height: "16px", src: EMPTY_IMG }
+                }
+            }
+        }
     }
 }
 

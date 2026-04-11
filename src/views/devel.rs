@@ -9,11 +9,13 @@ pub fn Devel() -> Element {
     rsx! {
         div { class: "app-header",
             h1 { class: "app-header-h font-bagel",
-                img { class: "app-img", alt: "App", src: crate::APP_IMG }
+                a { href: ".",
+                    img { class: "app-img", alt: "App", src: crate::APP_IMG }
+                }
                 p { "{page_header}" }
             }
             p { class: "app-header-p", "{page_desc}" }
         }
-        List {is_devel: true}
+        List { is_devel: true }
     }
 }
