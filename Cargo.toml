@@ -19,13 +19,13 @@ repository = "https://github.com/aki-akaguma/webapp-index"
 crates = ["dioxus-fullstack"]
 
 [patch.crates-io]
-dioxus-fullstack = { path = "./patched/dioxus-fullstack-0.7.4" }
+dioxus-fullstack = { path = "./patched/dioxus-fullstack-0.7.5" }
 
 [dependencies]
 # dioxus family
-dioxus = { version = "0.7.4", features = ["fullstack", "router"] }
-dioxus-fullstack = "0.7.4"
-dioxus-desktop = { version = "0.7.4", optional = true }
+dioxus = { version = "0.7.5", features = ["fullstack", "router"] }
+dioxus-fullstack = "0.7.5"
+dioxus-desktop = { version = "0.7.5", optional = true }
 dioxus-logger = "0.7.4"
 
 # depend on dioxus
