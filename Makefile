@@ -32,7 +32,7 @@ bundle-web:
 	cp -a resources/config.toml target/dx/index/release/web/ && chmod 640 target/dx/index/release/web/config.toml
 
 bundle-desktop:
-	dx bundle --desktop --release
+	dx bundle --desktop --release --package-types appimage
 
 #	dx bundle --desktop --release --features backend_next
 
