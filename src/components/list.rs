@@ -73,8 +73,6 @@ pub fn List(is_devel: bool, desc: DescMsg) -> Element {
                     }
                 } else if let Err(e) = apps_r {
                     "Error:{e}"
-                } else {
-                    "Not reached"
                 }
             } else {
                 "Loading..."

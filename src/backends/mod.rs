@@ -118,6 +118,7 @@ async fn find_fnm_apk_file_name(name: &str, file_name: String) -> Result<String>
 
 #[cfg(feature = "server")]
 async fn find_fnm_appimage(name: &str) -> Result<String> {
+    use semver::Version;
     // appimage file name format:
     //   memboost_0.1.1_x86_64.AppImage
     let ends = "_x86_64.AppImage";
@@ -129,28 +130,20 @@ async fn find_fnm_appimage(name: &str) -> Result<String> {
     while let Some(entry) = entries.next_entry().await? {
         let fnm = entry.file_name().to_string_lossy().to_string();
         if fnm.starts_with(name) && fnm.ends_with(ends) {
-            let version = &fnm[(name.len() + 1)..(fnm.len() - ends.len())];
-            vec.push(version.to_string());
+            let fnm_version = &fnm[(name.len() + 1)..(fnm.len() - ends.len())];
+            let version_s = fnm_version.to_string();
+            let version = Version::parse(version_s.as_str())?;
+            vec.push((version, version_s));
         }
     }
     if vec.is_empty() {
         Ok("".to_string())
     } else {
         let last_version = if vec.len() == 1 {
-            &vec[0]
+            &vec[0].1
         } else {
-            use version_compare::{Cmp, Version};
-            vec.sort_by(|a, b| {
-                let aa = Version::from(a).unwrap();
-                let bb = Version::from(b).unwrap();
-                match aa.compare(bb) {
-                    Cmp::Eq => std::cmp::Ordering::Equal,
-                    Cmp::Lt => std::cmp::Ordering::Less,
-                    Cmp::Gt => std::cmp::Ordering::Greater,
-                    _ => unreachable!(),
-                }
-            });
-            &vec[vec.len() - 1]
+            vec.sort_by(|a, b| a.0.cmp(&b.0));
+            &vec[vec.len() - 1].1
         };
         Ok(format!("{name}_{last_version}{ends}"))
     }

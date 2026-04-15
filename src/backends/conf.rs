@@ -71,7 +71,7 @@ impl ConfApp {
     #[allow(dead_code)]
     #[inline(always)]
     pub fn is_desktop(&self) -> bool {
-        self.is_desktop_windows() || self.is_desktop_windows()
+        self.is_desktop_linux() || self.is_desktop_windows()
     }
     fn_is_xxx_yyy!(is_desktop_linux, desktop);
     fn_is_xxx_yyy!(is_desktop_windows, desktop);
