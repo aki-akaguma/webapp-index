@@ -32,6 +32,7 @@ serde = { version = "1.0" }
 
 # what dioxus depends on, optional
 tokio = { version = "1.48", features = ["fs"], optional = true }
+tracing = { version = "0.1", optional = true }
 
 # other, optional
 console_error_panic_hook = { version = "0.1", optional = true }
@@ -51,7 +52,7 @@ default = ["web"]
 web = ["dioxus/web", "dep:console_error_panic_hook"]
 desktop = ["dioxus/desktop", "dep:dioxus-desktop"]
 mobile = ["dioxus/mobile"]
-server = ["dioxus/server", "dep:tokio", "dep:toml", "dep:semver"]
+server = ["dioxus/server", "dep:tracing", "dep:tokio", "dep:toml", "dep:semver"]
 
 debian_build = ["desktop"]
 

@@ -150,7 +150,11 @@ async fn find_fnm_appimage(name: &str) -> Result<String> {
 }
 
 #[post("/api/v1/apps")]
+#[tracing::instrument(fields(is_devel))]
 pub async fn list_apps(is_devel: bool) -> Result<Vec<AppInfo>> {
+    // Record the IP in the current tracing span.
+    tracing::Span::current().record("is_devel", &is_devel);
+
     let mut apps = Vec::new();
     let file_path = "/opt/webapp-akiapp/web/config.toml";
     let conf_string = read_to_string(file_path)
