@@ -33,17 +33,32 @@ pub fn List(is_devel: bool) -> Element {
     let apps_r = use_resource(move || async move { crate::backends::list_apps(is_devel).await });
     //
     let dialog = use_store(AppDialog::default);
-    let dialog_app_nm = dialog.app_nm();
-    let dialog_desc = dialog.desc();
-    let dialog_a_href = dialog.a_href();
-    let dialog_a_file_name = dialog.a_file_name();
-    let dialog_img_src = dialog.img_src();
-    let dialog_msg = dialog.msg();
 
-    // Inside the List component
-    let is_open = dialog.is_open();
+    rsx! {
+        div { class: "app-list",
+            if let Some(apps_r) = &*apps_r.read() {
+                if let Ok(apps) = apps_r {
+                    AppDetailDialog { dialog }
+                    for app_info in apps.iter() {
+                        AppListRowCm {
+                            app_info: app_info.clone(),
+                            dialog,
+                        }
+                    }
+                } else if let Err(e) = apps_r {
+                    "Error:{e}"
+                }
+            } else {
+                "Loading..."
+            }
+        }
+    }
+}
 
+#[component]
+fn AppDetailDialog(dialog: Store<AppDialog>) -> Element {
     // Define “side effects” that monitor state and call JS methods
+    let is_open = dialog.is_open();
     use_effect(move || {
         if is_open() {
             spawn(async move {
@@ -57,50 +72,33 @@ pub fn List(is_devel: bool) -> Element {
             });
         }
     });
-    //
+
     rsx! {
-        div { class: "app-list",
-            if let Some(apps_r) = &*apps_r.read() {
-                if let Ok(apps) = apps_r {
-                    dialog { id: "app-list-dialog", class: "app-list-dialog",
-                        h3 { class: "app-list-row-h", "{dialog_app_nm}" }
-                        p { class: "app-list-row-p", "{dialog_desc}" }
-                        a {
-                            id: "download_link1",
-                            class: "app-list-row-links-a",
-                            target: "_blank",
-                            href: "{dialog_a_href}",
-                            download: "{dialog_a_file_name}",
-                            onclick: move |_evt| async move {
-                                download_file(dialog.a_href().to_string()).await;
-                            },
-                            img {
-                                class: "app-list-row-links-a-img",
-                                alt: "Web",
-                                src: "{dialog_img_src}",
-                            }
-                            p { "{dialog_msg}" }
-                        }
-                        button {
-                            class: "app-list-dialog-btn",
-                            onclick: move |_evt| async move {
-                                //dioxus::logger::tracing::info!("{_evt:#?}");
-                                dialog.is_open().set(false);
-                            },
-                            "Close"
-                        }
-                    }
-                    for app_info in apps.iter() {
-                        AppListRowCm {
-                            app_info: app_info.clone(),
-                            dialog,
-                        }
-                    }
-                } else if let Err(e) = apps_r {
-                    "Error:{e}"
+        dialog { id: "app-list-dialog", class: "app-list-dialog",
+            h3 { class: "app-list-row-h", "{dialog.app_nm()}" }
+            p { class: "app-list-row-p", "{dialog.desc()}" }
+            a {
+                id: "download_link1",
+                class: "app-list-row-links-a",
+                target: "_blank",
+                href: "{dialog.a_href()}",
+                download: "{dialog.a_file_name()}",
+                onclick: move |_evt| async move {
+                    download_file(dialog.a_href().to_string()).await;
+                },
+                img {
+                    class: "app-list-row-links-a-img",
+                    alt: "Web",
+                    src: "{dialog.img_src()}",
                 }
-            } else {
-                "Loading..."
+                p { "{dialog.msg()}" }
+            }
+            button {
+                class: "app-list-dialog-btn",
+                onclick: move |_evt| {
+                    dialog.is_open().set(false);
+                },
+                "Close"
             }
         }
     }
