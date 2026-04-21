@@ -1,6 +1,7 @@
 
 [base]
 base_path = "/opt"
+public_url = "https://aki.omusubi.org"
 
 [[apps]]
 name = "broinfo"

@@ -53,6 +53,10 @@ fn main() {
     dioxus::launch(App);
 }
 
+// Define default value as empty or temporary value
+pub static PUBLIC_URL: GlobalSignal<String> =
+    Signal::global(|| "https://aki.omusubi.org".to_string());
+
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("/assets/css/main.css");
 const TAILWIND_CSS: Asset = asset!("/assets/css/tailwind.css");
@@ -65,6 +69,13 @@ const LINUX_IMG: Asset = asset!("/assets/img/linux.jpg");
 
 #[component]
 fn App() -> Element {
+    // Get URL from server only once at startup
+    use_future(|| async move {
+        if let Ok(url) = crate::backends::get_base_config().await {
+            *PUBLIC_URL.write() = url;
+        }
+    });
+
     rsx! {
         document::Link { rel: "preconnect", href: "https://fonts.googleapis.com" }
         document::Link {

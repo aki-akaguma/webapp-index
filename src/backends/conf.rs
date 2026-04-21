@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "server")]
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct Config {
     pub base: ConfBase,
     pub apps: Vec<ConfApp>,
@@ -9,9 +9,10 @@ pub struct Config {
 }
 
 #[cfg(feature = "server")]
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct ConfBase {
-    base_path: String,
+    pub base_path: String,
+    pub public_url: String,
 }
 
 macro_rules! fn_is_xxx_yyy {

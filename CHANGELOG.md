@@ -10,8 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * `tracing`
 
 ### Changed
+* `<dialog>` elements open control
 * I reorganized the dependencies in `Cargo.toml`.
 * `version_compare` to `semver` crate
+
+### Fixed
+* `Version::parse(version_s.as_str())?`
 
 
 ## [0.1.3] (2026-04-15)

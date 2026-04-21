@@ -9,6 +9,7 @@ pub struct DescMsg {
 
 #[derive(Store, Default, Debug)]
 struct AppDialog {
+    is_open: bool,
     app_nm: String,
     desc: String,
     a_href: String,
@@ -16,8 +17,6 @@ struct AppDialog {
     img_src: String,
     msg: String,
 }
-
-const BASE_URL: &str = "https://aki.omusubi.org";
 
 #[component]
 pub fn List(is_devel: bool, desc: DescMsg) -> Element {
@@ -30,6 +29,24 @@ pub fn List(is_devel: bool, desc: DescMsg) -> Element {
     let dialog_a_file_name = dialog.a_file_name();
     let dialog_img_src = dialog.img_src();
     let dialog_msg = dialog.msg();
+
+    // Inside the List component
+    let is_open = dialog.is_open();
+
+    // Define “side effects” that monitor state and call JS methods
+    use_effect(move || {
+        if is_open() {
+            spawn(async move {
+                let js = r#"document.getElementById("app-list-dialog").showModal();"#;
+                let _ = document::eval(js).await;
+            });
+        } else {
+            spawn(async move {
+                let js = r#"document.getElementById("app-list-dialog").close();"#;
+                let _ = document::eval(js).await;
+            });
+        }
+    });
     //
     rsx! {
         div { class: "app-list",
@@ -58,8 +75,7 @@ pub fn List(is_devel: bool, desc: DescMsg) -> Element {
                             class: "app-list-dialog-btn",
                             onclick: move |_evt| async move {
                                 //dioxus::logger::tracing::info!("{_evt:#?}");
-                                let js = r#"document.getElementById("app-list-dialog").close();"#;
-                                let _ = document::eval(js).await;
+                                dialog.is_open().set(false);
                             },
                             "Close"
                         }
@@ -90,16 +106,13 @@ struct AppListRowProps {
 
 #[component]
 pub fn AppListRowCm(props: AppListRowProps) -> Element {
-    let app_info = props.app_info;
-    let app_nm = app_info.name();
-    let desc = app_info.desc();
+    let app_info_sig = use_signal(|| props.app_info.clone());
+    let desc_msg_sig = use_signal(|| props.desc.clone());
+    let dialog = props.dialog;
     //
-    let descmsg_s = use_signal(|| props.desc.clone());
-    let app_nm_s = use_signal(|| app_nm.to_string());
-    let desc_s = use_signal(|| desc.to_string());
-    let app_info_s = use_store(|| app_info.clone());
-    let apk_fnms_s = use_store(|| app_info_s().apk_fnms().to_vec());
-    let appimage_fnms_s = use_store(|| app_info_s().appimage_fnms().to_vec());
+    let app_nm = app_info_sig.read().name().to_string();
+    let desc = app_info_sig.read().desc().to_string();
+    //
     rsx! {
         div { class: "app-list-row",
             h3 { class: "app-list-row-h", "{app_nm}" }
@@ -109,15 +122,18 @@ pub fn AppListRowCm(props: AppListRowProps) -> Element {
                     class: "app-list-row-links-a",
                     onclick: move |_evt| async move {
                         //dioxus::logger::tracing::info!("{_evt:#?}");
-                        let url = format!("{BASE_URL}/{}/", app_nm_s());
-                        props.dialog.app_nm().set(app_nm_s());
-                        props.dialog.desc().set(desc_s());
-                        props.dialog.a_href().set(url);
-                        props.dialog.a_file_name().set("".to_string());
-                        props.dialog.img_src().set(crate::WEBAPP_IMG.to_string());
-                        props.dialog.msg().set(descmsg_s().webapp.clone());
-                        let js = r#"document.getElementById("app-list-dialog").showModal();"#;
-                        let _ = document::eval(js).await;
+                        let info = app_info_sig.read();
+                        let name = info.name().to_string();
+                        let base = crate::PUBLIC_URL();
+                        let url = format!("{base}/{}/", name);
+                        //
+                        dialog.app_nm().set(name);
+                        dialog.desc().set(info.desc().to_string());
+                        dialog.a_href().set(url);
+                        dialog.a_file_name().set("".to_string());
+                        dialog.img_src().set(crate::WEBAPP_IMG.to_string());
+                        dialog.msg().set(desc_msg_sig().webapp.clone());
+                        dialog.is_open().set(true);
                     },
                     img {
                         class: "app-list-row-links-a-img",
@@ -125,23 +141,27 @@ pub fn AppListRowCm(props: AppListRowProps) -> Element {
                         src: crate::WEBAPP_IMG,
                     }
                 }
-                for apk_fnm in apk_fnms_s() {
+                // APK link
+                for apk_fnm in app_info_sig.read().apk_fnms().to_vec() {
                     a {
                         class: "app-list-row-links-a",
                         onclick: move |_evt| {
-                            let app_nm = app_nm_s().clone();
-                            let apk_fnm = apk_fnm.to_string();
+                            let info = app_info_sig.read();
+                            let name = info.name().to_string();
+                            let desc = info.desc().to_string();
+                            let msg = desc_msg_sig.read().android.clone();
+                            let apk = apk_fnm.clone();
+                            let base = crate::PUBLIC_URL();
+                            //
                             spawn(async move {
-                                //dioxus::logger::tracing::info!("{_evt:#?}");
-                                let url = format!("{BASE_URL}/akiapp/android/{app_nm}/{apk_fnm}");
-                                props.dialog.app_nm().set(app_nm_s());
-                                props.dialog.desc().set(desc_s());
-                                props.dialog.a_href().set(url);
-                                props.dialog.a_file_name().set(apk_fnm.to_string());
-                                props.dialog.img_src().set(crate::ANDROID_IMG.to_string());
-                                props.dialog.msg().set(descmsg_s().android.clone());
-                                let js = r#"document.getElementById("app-list-dialog").showModal();"#;
-                                let _ = document::eval(js).await;
+                                let url = format!("{base}/akiapp/android/{name}/{apk}");
+                                dialog.app_nm().set(name);
+                                dialog.desc().set(desc);
+                                dialog.a_href().set(url);
+                                dialog.a_file_name().set(apk);
+                                dialog.img_src().set(crate::ANDROID_IMG.to_string());
+                                dialog.msg().set(msg);
+                                dialog.is_open().set(true);
                             });
                         },
                         img {
@@ -151,23 +171,27 @@ pub fn AppListRowCm(props: AppListRowProps) -> Element {
                         }
                     }
                 }
-                for appimage_fnm in appimage_fnms_s() {
+                // AppImage Link
+                for appimage_fnm in app_info_sig.read().appimage_fnms().to_vec() {
                     a {
                         class: "app-list-row-links-a",
                         onclick: move |_evt| {
-                            let app_nm = app_nm_s().clone();
-                            let appimage_fnm = appimage_fnm.to_string();
+                            let info = app_info_sig.read();
+                            let name = info.name().to_string();
+                            let desc = info.desc().to_string();
+                            let msg = desc_msg_sig.read().linux.clone();
+                            let img_fnm = appimage_fnm.clone();
+                            let base = crate::PUBLIC_URL();
+                            //
                             spawn(async move {
-                                //dioxus::logger::tracing::info!("{_evt:#?}");
-                                let url = format!("{BASE_URL}/akiapp/desktop/{app_nm}/{appimage_fnm}");
-                                props.dialog.app_nm().set(app_nm_s());
-                                props.dialog.desc().set(desc_s());
-                                props.dialog.a_href().set(url);
-                                props.dialog.a_file_name().set(appimage_fnm.to_string());
-                                props.dialog.img_src().set(crate::LINUX_IMG.to_string());
-                                props.dialog.msg().set(descmsg_s().linux.clone());
-                                let js = r#"document.getElementById("app-list-dialog").showModal();"#;
-                                let _ = document::eval(js).await;
+                                let url = format!("{base}/akiapp/desktop/{name}/{img_fnm}");
+                                dialog.app_nm().set(name);
+                                dialog.desc().set(desc);
+                                dialog.a_href().set(url);
+                                dialog.a_file_name().set(img_fnm);
+                                dialog.img_src().set(crate::LINUX_IMG.to_string());
+                                dialog.msg().set(msg);
+                                dialog.is_open().set(true);
                             });
                         },
                         img {

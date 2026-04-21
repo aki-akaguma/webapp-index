@@ -8,10 +8,79 @@ use anyhow::Context;
 #[cfg(feature = "server")]
 use tokio::fs::{read_dir, read_to_string, try_exists};
 
+#[cfg(feature = "server")]
+use std::time::SystemTime;
+
+#[cfg(feature = "server")]
+use tokio::sync::RwLock;
+
 mod conf;
 
 #[cfg(feature = "server")]
 use conf::{ConfApp, Config};
+
+#[cfg(feature = "server")]
+struct ConfigCache {
+    config: Config,
+    mtime: SystemTime,
+}
+
+#[cfg(feature = "server")]
+static CACHE: RwLock<Option<ConfigCache>> = RwLock::const_new(None);
+
+#[cfg(feature = "server")]
+async fn get_config() -> Result<Config> {
+    let file_path = "/opt/webapp-akiapp/web/config.toml";
+
+    // Get file metadata (to check modification date and time)
+    let metadata = tokio::fs::metadata(file_path)
+        .await
+        .with_context(|| format!("Failed to get metadata for '{}'", file_path))?;
+    let mtime = metadata.modified()?;
+
+    // 1. First, check if the cache is enabled with a read lock.
+    {
+        let cache = CACHE.read().await;
+        if let Some(c) = &*cache {
+            if c.mtime >= mtime {
+                return Ok(c.config.clone());
+            }
+        }
+    }
+
+    // 2. If cache is missing or stale, acquire write lock and update
+    let mut cache = CACHE.write().await;
+
+    // Double-checked locking:
+    // may have been updated by another thread while waiting for lock acquisition.
+    if let Some(c) = &*cache {
+        if c.mtime >= mtime {
+            return Ok(c.config.clone());
+        }
+    }
+
+    // Load and parse the file
+    let conf_string = read_to_string(file_path).await?;
+    let config: Config = toml::from_str(&conf_string)?;
+
+    // Update cache
+    *cache = Some(ConfigCache {
+        config: config.clone(),
+        mtime,
+    });
+
+    Ok(config)
+}
+
+#[post("/api/v1/apps/bc")]
+#[tracing::instrument(fields(is_devel))]
+pub async fn get_base_config() -> Result<String, ServerFnError> {
+    let conf = get_config()
+        .await
+        .map_err(|e| ServerFnError::new(e.to_string()))?;
+    // Returns [base] public_url in config.toml (needs addition to structure)
+    Ok(conf.base.public_url.clone())
+}
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, PartialEq)]
 pub struct AppInfo {
@@ -124,16 +193,22 @@ async fn find_fnm_appimage(name: &str) -> Result<String> {
     let ends = "_x86_64.AppImage";
     let mut vec = vec![];
     let dir_path = format!("/opt/webapp-{name}/desktop");
+    //
+    // Error handling in case the directory does not exist
     let mut entries = read_dir(&dir_path)
         .await
         .with_context(|| format!("Failed to read dir from '{}'", &dir_path))?;
+    //
     while let Some(entry) = entries.next_entry().await? {
         let fnm = entry.file_name().to_string_lossy().to_string();
         if fnm.starts_with(name) && fnm.ends_with(ends) {
             let fnm_version = &fnm[(name.len() + 1)..(fnm.len() - ends.len())];
             let version_s = fnm_version.to_string();
-            let version = Version::parse(version_s.as_str())?;
-            vec.push((version, version_s));
+            if let Ok(version) = Version::parse(version_s.as_str()) {
+                vec.push((version, version_s));
+            } else {
+                tracing::warn!("Skipping invalid version format: {}", fnm);
+            }
         }
     }
     if vec.is_empty() {
@@ -153,14 +228,12 @@ async fn find_fnm_appimage(name: &str) -> Result<String> {
 #[tracing::instrument(fields(is_devel))]
 pub async fn list_apps(is_devel: bool) -> Result<Vec<AppInfo>> {
     // Record the IP in the current tracing span.
-    tracing::Span::current().record("is_devel", &is_devel);
+    tracing::Span::current().record("is_devel", is_devel);
+
+    // Get settings from cache
+    let conf = get_config().await?;
 
     let mut apps = Vec::new();
-    let file_path = "/opt/webapp-akiapp/web/config.toml";
-    let conf_string = read_to_string(file_path)
-        .await
-        .with_context(|| format!("Failed to read from '{}'", file_path))?;
-    let conf: Config = toml::from_str(conf_string.as_str())?;
     let iter = if !is_devel {
         conf.apps.iter()
     } else {
