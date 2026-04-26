@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 * update crate: dioxus(0.7.6)
 
+### Fixed
+* link to web application was download link
+
 
 ## [0.1.4] (2026-04-21)
 ### Added

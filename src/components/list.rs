@@ -73,6 +73,12 @@ fn AppDetailDialog(dialog: Store<AppDialog>) -> Element {
         }
     });
 
+    let download_opt: Option<String> = if dialog.a_file_name().is_empty() {
+        None
+    } else {
+        Some(dialog.a_file_name().to_string())
+    };
+
     rsx! {
         dialog { id: "app-list-dialog", class: "app-list-dialog",
             h3 { class: "app-list-row-h", "{dialog.app_nm()}" }
@@ -82,7 +88,7 @@ fn AppDetailDialog(dialog: Store<AppDialog>) -> Element {
                 class: "app-list-row-links-a",
                 target: "_blank",
                 href: "{dialog.a_href()}",
-                download: "{dialog.a_file_name()}",
+                download: download_opt,
                 onclick: move |_evt| async move {
                     download_file(dialog.a_href().to_string()).await;
                 },
@@ -105,7 +111,10 @@ fn AppDetailDialog(dialog: Store<AppDialog>) -> Element {
 }
 
 #[component]
-fn AppListRowCm(app_info: ReadSignal<crate::backends::AppInfo>, dialog: Store<AppDialog>) -> Element {
+fn AppListRowCm(
+    app_info: ReadSignal<crate::backends::AppInfo>,
+    dialog: Store<AppDialog>,
+) -> Element {
     let desc = use_context::<DescMsg>();
     rsx! {
         div { class: "app-list-row",
